@@ -22,9 +22,9 @@ services:
       - VPN_TYPE=openvpn
       # OpenVPN:
       - OPENVPN_USER=mittal.mak@gmail.com
-      - OPENVPN_PASSWORD=G0fYl8xeIwTx
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       # Wireguard:
-      # - WIREGUARD_PRIVATE_KEY=wOEI9rqqbDwnN8/Bpp22sVz48T71vJ4fYmFWujulwUU=
+      # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       # - WIREGUARD_ADDRESSES=10.64.222.21/32
       # Timezone for accurate log times
       - TZ=America/Los_Angeles
