@@ -1,0 +1,62 @@
+# Ignore node_modules, logs, and OS files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore editor files
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.idea/
+.vscode/
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore build artifacts
+dist/
+build/
+out/
+
+# Ignore Docker artifacts except compose files
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# Ignore other files
+*.bak
+*.tmp
+*.old
+
+#ingore pyton cache, compiled files, virtual environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+ENV.bak/
+.venv.bak/
+
+#ignore volume dir
+volumes/
+
+# ignore logs
+logs/
+*.log
+*.out

@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+  blocky:
+    image: spx01/blocky
+    container_name: blocky
+    restart: unless-stopped
+    hostname: blocky-hostname
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "4000:4000/tcp"
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - /Users/mittalmak/dev/docker/blocky/config.yml:/app/config.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - /Users/mittalmak/dev/docker/blocky/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin

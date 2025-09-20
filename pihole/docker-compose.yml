@@ -1,0 +1,96 @@
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    # Remove host networking and add port mapping
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "1010:80/tcp"  # Map container port 80 to host port 1010
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    environment:
+      TZ: '${TIMEZONE}'
+      FTLCONF_WEBSERVER_API_PASSWORD: '${PIHOLE_PASSWORD}' # Updated v6 password variable
+      FTLCONF_LOCAL_IPV4: '${PIHOLE_IP}'
+      PIHOLE_DNS_: '1.1.1.1;8.8.8.8'
+      DNSSEC: 'true'
+      DNSMASQ_LISTENING: 'all'
+      WEBTHEME: 'default-dark'
+      REV_SERVER: 'true'
+      REV_SERVER_DOMAIN: 'local'
+      REV_SERVER_TARGET: '${ROUTER_IP}'
+      REV_SERVER_CIDR: '${NETWORK_CIDR}'
+      TEMPERATUREUNIT: 'f'
+      ADMIN_EMAIL: '${ADMIN_EMAIL}'
+      QUERY_LOGGING: 'true'
+      INSTALL_WEB_SERVER: 'true'
+      INSTALL_WEB_INTERFACE: 'true'
+      LIGHTTPD_ENABLED: 'true'
+      # Remove FTLCONF_WEBSERVER_PORT since we're using port mapping now
+      # FTL configuration for better performance and client detection
+      FTLCONF_MAXDBDAYS: '365'
+      FTLCONF_DBIMPORT: 'yes'
+      FTLCONF_MAXLOGAGE: '24.0'
+      FTLCONF_PRIVACYLEVEL: '0'
+      FTLCONF_IGNORE_LOCALHOST: 'no'
+      FTLCONF_RESOLVE_IPV6: 'yes'
+      FTLCONF_RESOLVE_IPV4: 'yes'
+      FTLCONF_ANALYZE_ONLY_A_AND_AAAA: 'false'
+    volumes:
+      - '${PIHOLE_VOLUME}/etc-pihole:/etc/pihole'
+      - '${PIHOLE_VOLUME}/etc-dnsmasq.d:/etc/dnsmasq.d'
+      - '${PIHOLE_VOLUME}/logs:/var/log/pihole'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    networks:
+      pihole-network:
+        ipv4_address: 172.20.0.10  # Assign static IP to pihole
+    healthcheck:
+      test: ["CMD", "dig", "@127.0.0.1", "google.com"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  pihole-updater:
+    container_name: pihole-updater
+    image: alpine:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    volumes:
+      - '${PIHOLE_BASE_DIR}/scripts:/scripts:ro'
+      - '${PIHOLE_VOLUME}/etc-pihole:/etc/pihole'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    environment:
+      TZ: '${TIMEZONE}'
+    restart: unless-stopped
+    command: >
+      sh -c "
+      apk add --no-cache curl docker-cli dcron &&
+      echo '0 2 * * 0 /scripts/update-blocklists.sh' > /etc/crontabs/root &&
+      echo '0 3 * * 0 /scripts/restart-pihole.sh' >> /etc/crontabs/root &&
+      crond -f -d 8
+      "
+    networks:
+      - pihole-network
+    depends_on:
+      - pihole
+
+networks:
+  pihole-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
