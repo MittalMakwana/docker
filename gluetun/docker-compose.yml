@@ -21,13 +21,13 @@ services:
       - VPN_SERVICE_PROVIDER=fastestvpn
       - VPN_TYPE=openvpn
       # OpenVPN:
-      - OPENVPN_USER=mittal.mak@gmail.com
+      - OPENVPN_USER=${OPENVPN_EMAIL}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       # Wireguard:
       # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       # - WIREGUARD_ADDRESSES=10.64.222.21/32
       # Timezone for accurate log times
-      - TZ=America/Los_Angeles
+      - TZ=${TZ}
       # Server list updater
       # See https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#update-the-vpn-servers-list
       - UPDATER_PERIOD=24h
